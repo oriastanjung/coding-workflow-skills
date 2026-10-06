@@ -7,16 +7,21 @@ gate has passed for every slice.
 ## Loop per slice
 
 1. `gh stack sync`, then `gh stack add <slice-branch>` (Main Agent).
-2. Set the slice's ticket to In Progress (`write-or-update-ticket.md`).
-3. Spawn an implementer subagent to build the slice.
-4. When it reports done, spawn a **new** reviewer subagent
-   (`pr-review.md`). Fix accepted objections and review again until the
-   verdict is APPROVE.
-5. Spawn a gate subagent to run: `lint`, `test`, `build`, `test:e2e`.
-6. Commit the slice's paths, `gh stack submit` (`create-pr.md`). Set the
-   ticket to In Review.
-7. When the gate is green, merge, `gh stack sync`, set the ticket to Done
-   with a comment naming what shipped and what the gate reported.
+2. Open the slice's PR as a draft before any code (`create-pr.md`). Set the
+   slice's ticket to In Progress with the PR link
+   (`write-or-update-ticket.md`).
+3. Spawn an implementer subagent to build the slice. Commit its paths,
+   `gh stack submit`, and post a progress comment on the PR.
+4. Review round: spawn a **new** reviewer subagent (`pr-review.md`). It posts
+   its report as a PR comment. Main Agent replies on the PR to every
+   objection, sends accepted fixes to the implementer, commits, submits, and
+   starts the next round. Repeat until the verdict is APPROVE.
+5. Spawn a gate subagent to run `lint`, `test`, `build`, `test:e2e`. It posts
+   the real output as a PR comment. Red gate: fix, push, new review round.
+6. Fill the final PR description, mark the PR ready
+   (`gh pr ready <number>`), set the ticket to In Review.
+7. Merge, `gh stack sync`, set the ticket to Done with a comment that links
+   the PR.
 8. Go to the next slice. Stop only when the last slice is merged.
 
 ## Division of labour
@@ -24,10 +29,11 @@ gate has passed for every slice.
 | Step | Who |
 |---|---|
 | Implement the slice | implementer subagent |
-| Review the diff | new reviewer subagent, every slice |
-| `lint`, `test`, `build`, **`test:e2e`** | gate subagent |
+| Review the diff, post the round on the PR | new reviewer subagent, every round |
+| `lint`, `test`, `build`, **`test:e2e`**, post output on the PR | gate subagent |
 | Branches, commits, `gh stack`, merge | Main Agent |
-| Ticket status and comments | Main Agent |
+| Progress comments and replies to objections on the PR | Main Agent |
+| Ticket status | Main Agent |
 
 Main Agent never implements a slice itself. Always use a subagent for
 implementation. Delegate first, review second.
@@ -94,6 +100,8 @@ Every brief names:
 4. The gate to run, and that the real output is pasted back, not summarised.
 5. **Run no git commands at all** — no commit, push, `checkout`, `pull` or
    `branch`. Main Agent reviews the working diff.
+6. The PR number. Reviewer and gate subagents post their report there with
+   `gh pr comment`; that is the only write they may do.
 
 ## Parallel agents share ONE working tree
 

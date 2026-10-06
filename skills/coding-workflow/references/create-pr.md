@@ -1,5 +1,22 @@
 # Create the PR
 
+## Open the PR first
+
+The PR exists before any code for the slice. It is the slice's log: progress,
+every review round, every reply, every gate run go there as comments. The
+ticket only tracks status.
+
+```bash
+gh stack add <slice-branch>
+git commit --allow-empty -m "Start <slice name>"
+gh stack submit --auto                 # --auto creates new PRs as drafts
+gh pr edit <number> --title "<title>" --body-file <draft.md>
+```
+
+Write a short draft description at once: the slice, its acceptance criteria
+copied from the plan, the ticket link, and its position in the stack. Replace
+it with the full template below before you mark the PR ready.
+
 ## Always use `gh stack`
 
 Every PR in this workflow is part of a stack made with `gh stack`, even when
@@ -14,7 +31,7 @@ gh stack init <first-slice-branch>     # first slice only
 gh stack add <next-slice-branch>       # each later slice, on top of the last
 git add <paths for this slice only>    # never `git add -A`
 git commit -m "<one imperative sentence, max 72 chars>"
-gh stack submit                        # push branches, create or update PRs
+gh stack submit                        # push branches, update the PRs
 gh stack view                          # confirm order and PR links
 ```
 
@@ -93,8 +110,8 @@ summary line. For each level marked n/a, give the reason.
 | --- | --- | --- |
 | AC1: … | Met | Screenshot 2, `orders.e2e.ts` |
 
-Changes from the plan, and why. The PR reviewer's verdict, and what changed
-because of it.
+Changes from the plan, and why. The number of review rounds, the final
+verdict, and links to the round comments.
 
 ## How to review
 Where to start reading, and steps to try it locally:
@@ -121,5 +138,7 @@ always stay.
 
 ## Draft or ready
 
-Open as ready for review when every gate passed. Open as a draft when a gate
-is blocked, and put what is missing at the top of the description.
+The PR stays a draft until the last review round is APPROVE and the gate is
+green. Then fill the full description and run `gh pr ready <number>`. When a
+gate is blocked, keep it a draft and put what is missing at the top of the
+description.

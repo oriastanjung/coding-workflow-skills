@@ -1,6 +1,6 @@
 ---
 name: coding-workflow
-description: How the owner ships features — plan mode first (no plan, no start), then tickets, then one stacked PR per vertical slice via `gh stack`. A fresh subagent implements, a fresh reviewer subagent reviews every slice, a gate subagent runs lint, test, build and e2e, Main Agent merges and updates the ticket. Use for any implementation task larger than a one-line fix. Stress-test the plan with references/interrogating.md.
+description: How the owner ships features — plan mode first (no plan, no start), then tickets, then one stacked PR per vertical slice via `gh stack`, opened as a draft before any code. The ticket tracks status; the PR tracks progress, every review round and every log. A fresh subagent implements, a fresh reviewer subagent challenges every round and posts it as a PR comment, a gate subagent runs lint, test, build and e2e and posts the output, Main Agent merges and updates the ticket. Use for any implementation task larger than a one-line fix. Stress-test the plan with references/interrogating.md.
 ---
 
 # Coding workflow
@@ -29,9 +29,16 @@ Run the stages in order. Each stage has its own guide in `references/`.
 | 1 | Run `scripts/prerequisite.sh` | this file |
 | 2 | Ask the two start questions | this file |
 | 3 | Write or update the ticket | `references/write-or-update-ticket.md` |
-| 4 | Implement and review the slice | `references/workflow.md`, `references/pr-review.md` |
-| 5 | Open the stacked PR | `references/create-pr.md` |
-| 6 | Merge, update the ticket, go to the next slice | `references/workflow.md` |
+| 4 | Open the slice's stacked PR as a draft | `references/create-pr.md` |
+| 5 | Implement, review rounds on the PR, gate on the PR | `references/workflow.md`, `references/pr-review.md` |
+| 6 | Mark ready, merge, update the ticket, go to the next slice | `references/workflow.md` |
+
+## Ticket for status, PR for progress
+
+- The **ticket** holds the status only: In Progress, In Review, Blocked, Done.
+- The **PR** holds everything else: each implementation step, each review
+  round, each reply to an objection, each gate run. If it happened, it is a
+  comment on the PR. Nothing is logged only in the chat.
 
 Repeat stages 4 to 6 slice by slice, one stacked PR at a time, until every
 slice has passed every gate. Do not stop at a partial stack.

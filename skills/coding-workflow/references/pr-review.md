@@ -1,8 +1,13 @@
 # PR review
 
-After each slice is implemented, spawn a **new** reviewer subagent. Its job
-is to find what is wrong. Agreement has no value; a missed problem costs much
-more to fix after merge.
+Every review round spawns a **new** reviewer subagent. Its job is to find what
+is wrong. Agreement has no value; a missed problem costs much more to fix
+after merge.
+
+Every round is posted on the slice's PR as a comment. A round that is not on
+the PR did not happen. Each round challenges again: the new reviewer reads the
+earlier rounds on the PR and checks that every accepted fix is real and that
+every rejection holds up.
 
 ## Choosing the reviewer
 
@@ -32,10 +37,15 @@ Plan: <absolute path to the plan>
 Slice: <slice name and its acceptance criteria>
 Diff: <how to get it, e.g. `git diff <base-branch>...HEAD` or the uncommitted paths>
 Original request: <the user's request, word for word>
+PR: <number>
+Round: <N>
 
-Read the plan, the diff, and the code around it. Check every claim against the
-repository; do not trust it. You are read-only: change nothing, run no git
-command that writes.
+Read the plan, the diff, the code around it, and the earlier review rounds on
+the PR (`gh pr view <number> --comments`). Check every claim against the
+repository; do not trust it. Challenge the earlier rounds: is each accepted
+fix really done, and does each rejection hold up? You are read-only: change
+nothing, run no git command that writes. Your only write is the report, posted
+with `gh pr comment <number> --body-file <file>`, titled "Review round <N>".
 
 Look for:
 1. Wrong premises. Does the change misread the request or the existing code?
@@ -67,20 +77,22 @@ request. Do not add style preferences to fill the list.
 
 ## Handling the report
 
-Keep the report as received. Then, for each objection:
+The report stays on the PR as posted. Then Main Agent posts one reply comment
+on the PR that answers every objection:
 
-- **Accept**: send the fix to the implementing subagent. Record what changed.
+- **Accept**: send the fix to the implementing subagent. Name the commit that
+  fixes it.
 - **Reject**: write the reason. "The reviewer misread X, see file:line" is a
   reason. "I disagree" is not.
 
 Verdict actions:
 
-- **APPROVE**: go to the gate and then the PR.
-- **APPROVE WITH CHANGES**: fix the accepted objections, then spawn a new
-  reviewer on the new diff.
+- **APPROVE**: go to the gate.
+- **APPROVE WITH CHANGES**: fix the accepted objections, push, then start the
+  next round with a new reviewer.
 - **REWORK**: go back to the plan for this slice, update it, implement again,
   and review again.
 
 If an objection depends on something only the user can decide, ask the user
-before you continue. Put the verdict and the accepted changes in the PR's Plan
-check section.
+before you continue, and post the answer on the PR. Put the round count and
+the final verdict in the PR's Plan check section.

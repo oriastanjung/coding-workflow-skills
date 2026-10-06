@@ -1,7 +1,8 @@
 # Write or update the ticket
 
-Every slice in the plan has one ticket. The ticket is the record of what the
-slice must do and where it stands.
+Every slice in the plan has one ticket. The ticket records what the slice must
+do and its status. Progress, review rounds and logs go on the slice's PR, not
+on the ticket.
 
 ## 1. Pick the tool
 
@@ -34,16 +35,16 @@ GitHub Issues fallback:
 ```bash
 gh issue create --title "<title>" --body-file <body.md> --label "<label>"
 gh issue comment <number> --body "<status update>"
-gh issue close <number> --comment "<what shipped, gate result>"
+gh issue close <number> --comment "<PR link>"
 ```
 
 ## 4. Keep the status true
 
 | Moment | Status | Comment |
 |---|---|---|
-| Slice starts | In Progress | Plan link, slice name |
-| PR opened | In Review | PR link |
-| PR merged, gate green | Done | What shipped and what the gate reported |
-| Gate blocked | Blocked | What is missing |
+| Slice starts, draft PR opened | In Progress | Plan link, slice name, PR link |
+| PR marked ready | In Review | PR link |
+| PR merged, gate green | Done | PR link |
+| Gate blocked | Blocked | Link to the PR comment that says what is missing |
 
 Never mark a ticket Done while any gate is red.
