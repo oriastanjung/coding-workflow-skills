@@ -12,6 +12,11 @@ exists, stop. Tell the user to enter plan mode (`EnterPlanMode`), write the
 plan, and get it approved. Do not implement anything without it, whatever the
 request says.
 
+Main Agent writes the plan itself, in plan mode. Never hand planning to a
+`Plan` subagent or any other subagent. Subagents may only look up facts for
+the plan (see `references/interrogating.md`); every planning decision stays
+with Main Agent and the user.
+
 The plan must be detailed enough that a junior engineer can implement it
 without asking questions: vertical slices in order, files per slice, acceptance
 criteria per slice, and the tests that prove each one.
