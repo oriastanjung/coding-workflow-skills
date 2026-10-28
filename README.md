@@ -28,6 +28,42 @@ slice per PR, all in a stack of PRs.
   enough to read in one sitting. You review the AI's work PR by PR, and you
   stay in control of what reaches the main branch.
 
+## Roles
+
+The work is split between two agents. Neither one does the other's job.
+
+| | Main agent | Implementor subagent |
+|---|---|---|
+| Who | The agent the user talks to | A subagent on a **Haiku**-tier model, one per slice, one at a time |
+| Plans | Writes the plan, interrogates the user, attacks its own plan | Never |
+| Code | Writes the brief: plan section, exact files, exact commands | Edits files and writes tests from the brief, and nothing else |
+| Commands | Re-runs the gate itself before trusting it | Runs only the lint, typecheck, test and build commands named in the brief, and reports the raw output |
+| Git and GitHub | Does all of it: branch, commit, push, issue, PR, comments, ready, merge, close | Never runs git, `gh` or `gh stack` |
+| Review | Reviews every diff cold and posts the round on the PR | Never reviews, and never spawns agents |
+| Proof | Checks the slice against the plan, uses the app in a browser, captures red-boxed stills | Never captures proof |
+
+Why the split:
+
+- **Cheap hands, careful head.** Haiku is fast and cheap enough to write
+  each slice. Every decision that is hard to undo stays with the stronger
+  main agent: the plan, git history, merges, and the claim that a slice is
+  done.
+- **No silent damage.** A subagent that can run git or `gh` can push to the
+  wrong base, merge too early or rewrite history, and the main agent learns
+  about it only from a summary. With no git access, its worst outcome is a
+  bad diff, which the main agent reads before anything leaves the machine.
+- **Review that is not self-review.** The implementor never judges its own
+  work. The main agent reads the diff as if someone else wrote it.
+
+The loop for each slice:
+
+1. The main agent writes the brief.
+2. The subagent implements it and reports a diff summary and gate output.
+3. The main agent reads the diff and re-runs the gate.
+4. If anything is wrong, the main agent sends a fix brief back to the subagent.
+5. When the slice is clean, the main agent commits, opens the PR, reviews,
+   proves, checks that the PR base is the integration branch, and merges.
+
 ## Credits
 
 Co-authored by **RealtaNua** ([Nael-Nathanael](https://github.com/Nael-Nathanael)).
@@ -59,7 +95,7 @@ flowchart LR
 
     subgraph SLICE["Per slice, bottom of the stack first"]
         direction LR
-        H["5 · Draft PR"] --> I["6 · Build + tests"]
+        H["5 · Draft PR"] --> I["6 · Build + tests<br/>(Haiku subagent)"]
         I --> J["6 · Review round"]
         J -- "FIX / REPLAN SLICE" --> I
         J -- SHIP --> K["6 · Gate"]
@@ -85,7 +121,9 @@ flowchart LR
 | 7 | Prove: against the plan, as a user, with red-boxed stills | `references/workflow.md`, `references/proof-capture.md` |
 | 8 | Mark ready, merge, close the issue, go to the next slice | `references/workflow.md`, `references/create-pr.md` |
 
-Stages 5 to 8 repeat slice by slice until the last PR is merged.
+Stages 5 to 8 repeat slice by slice until the last PR is merged. Only the
+code-and-tests part of stage 6 belongs to the subagent; every other stage
+belongs to the main agent (see [Roles](#roles)).
 
 Rules the skill enforces:
 
@@ -158,7 +196,9 @@ bash <skill folder>/scripts/prerequisite.sh        # add --ui for UI work
    objective.
 3. Invoke the skill (for example `/coding-workflow`), or ask the agent to
    follow `SKILL.md`.
-4. Answer the start question. The agent then works the stack slice by slice.
+4. Answer the start question. The main agent then works the stack slice by
+   slice, briefing one Haiku subagent per slice and doing every git, PR,
+   review, merge and proof step itself.
 
 ## Layout
 
