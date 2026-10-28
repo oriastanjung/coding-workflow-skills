@@ -5,8 +5,9 @@ reviewed pull requests.
 
 The agent reads the code, plans first, tracks each slice in a GitHub issue,
 and delivers one vertical slice per stacked PR with
-[`gh stack`](https://github.com/github/gh-stack). An outside reviewer attacks
-the plan and every slice. Every slice must pass lint, typecheck, test, build
+[`gh stack`](https://github.com/github/gh-stack). A Haiku subagent writes the
+code for each slice; the main agent does all git, PR, review, merge and proof
+work. Every slice must pass lint, typecheck, test, build
 and end-to-end tests, match the plan, and show proof: browser stills with a
 red box on the change, and a recording when the user's path changes.
 
@@ -77,7 +78,7 @@ flowchart LR
 | 0 | Read the code, then write a plan the user approves, settled by interrogation | `references/slice-plan.md`, `references/interrogating.md` |
 | 1 | Prerequisite check | `scripts/prerequisite.sh` |
 | 2 | Start question: existing GitHub issue | `SKILL.md` |
-| 3 | Outside reviewer attacks the plan | `references/plan-challenge.md` |
+| 3 | Main agent attacks its own plan | `references/plan-challenge.md` |
 | 4 | Write or update the issue | `references/write-or-update-ticket.md` |
 | 5 | Open the stacked PR as a draft | `references/create-pr.md` |
 | 6 | Build with tests, review rounds, gate | `references/workflow.md`, `references/test-levels.md`, `references/pr-review.md` |
@@ -93,8 +94,10 @@ Rules the skill enforces:
   Status is a label; the issue is closed when the PR merges.
 - **Always `gh stack`.** One vertical slice per branch and PR. The stack is
   kept in sync after every change.
-- **Independent review.** Another agent CLI, or a fresh session that knows
-  nothing of the work, attacks the plan and reviews every slice.
+- **Split roles.** One Haiku subagent per slice only implements what the
+  main agent's brief says: no git, no `gh`, no merge, no proof. The main
+  agent reviews every diff, runs the gate, commits, opens and merges PRs,
+  and captures the proof.
 - **Proof, not claims.** Every "done when" item points at a test, a terminal
   output or a still with a red box. Proof is uploaded to the PR with
   `gh pr edit --attach` and checked to render.
@@ -113,7 +116,7 @@ skill uses it; where it does not, the skill names a plain fallback:
 | Build checklist | The agent's task list | Checklist in `$WORK/plan.md` |
 | Browser | Browser tools such as a Playwright MCP server | The Playwright script in `references/proof-capture.md` |
 | Staying on target | A standing goal, such as `/goal` in Claude Code | Skip it |
-| Outside reviewer | Another agent CLI, run without interaction | A new session of the same agent |
+| Implementor | A subagent on a Haiku-tier model | The main agent implements, and the PR says so |
 
 ## Requirements
 

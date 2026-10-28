@@ -3,11 +3,10 @@
 Whoever wrote the plan is the worst person to find its holes. So before the
 first slice is built, an outside reader attacks the approved plan.
 
-**Who reads it.** Pick the first that works, as in `pr-review.md`: another
-agent CLI run without interaction, or a brand-new session that sees only the
-prompt below. Same model tier as yours or higher. Reviewing it yourself is the
-fallback of last resort, and every PR in the stack then says the plan review
-was not independent.
+**Who reads it.** The main agent, against the prompt below, before any
+subagent is briefed. No outside reviewer agent and never the Haiku
+implementor. Every PR in the stack says the plan review was done by the main
+agent.
 
 **What it gets.** The prompt below, filled in, and nothing more. No account of
 how you reached the plan, no word on which parts you trust.

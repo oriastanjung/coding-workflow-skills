@@ -11,15 +11,10 @@ whether each point you declined was declined for a sound reason.
 
 ## Who reviews
 
-Take the first that works:
-
-1. Another agent CLI or model, run without interaction, pointed at the repo.
-2. A brand-new session of the same agent that gets only the prompt below.
-3. You, against the prompt below. This is not independent, and the PR must
-   say so.
-
-Same model tier as yours or higher, never lower. A weaker reviewer misses
-design faults and fills the gap with style remarks.
+The main agent, against the prompt below. Never the Haiku implementor, and
+no outside reviewer agent: the implementor is a lower tier and wrote the
+code. Read the diff cold, as if someone else wrote it, and say on the PR
+that the review was done by the main agent.
 
 ## Prompt
 

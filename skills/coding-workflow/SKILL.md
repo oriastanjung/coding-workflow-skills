@@ -1,6 +1,6 @@
 ---
 name: coding-workflow
-description: How the owner ships features — read the code, write the plan with references/slice-plan.md and get it approved (no plan, no start), have an outside reviewer attack the plan, open a GitHub issue per slice, then one stacked PR per vertical slice via `gh stack`, opened as a draft before any code. The issue holds the status; the PR holds progress, every review round and every log. The agent builds from a task list with unit, integration and e2e tests, a fresh reviewer attacks every round and posts it on the PR, the agent runs lint, typecheck, test, build and e2e, checks the slice against the plan, uses the app in a real browser and uploads stills with a red box on the change, then merges and closes the issue. Works with any coding agent. Use for any implementation task larger than a one-line fix. Stress-test the plan with references/interrogating.md.
+description: How the owner ships features — read the code, write the plan with references/slice-plan.md and get it approved (no plan, no start), attack the plan yourself, open a GitHub issue per slice, then one stacked PR per vertical slice via `gh stack`, opened as a draft before any code. The issue holds the status; the PR holds progress, every review round and every log. A Haiku subagent per slice only writes code and tests from your brief; the main agent does all git, PR, review, merge and proof work. The main agent reviews every round and posts it on the PR, runs lint, typecheck, test, build and e2e, checks the slice against the plan, uses the app in a real browser and uploads stills with a red box on the change, then merges and closes the issue. Works with any coding agent. Use for any implementation task larger than a one-line fix. Stress-test the plan with references/interrogating.md.
 ---
 
 # Coding workflow
@@ -56,12 +56,45 @@ Run the stages in order. Each stage has its own guide in `references/`.
 | 0 | Read the code, then plan, interrogate and approve | this file, `references/slice-plan.md`, `references/interrogating.md` |
 | 1 | Run `scripts/prerequisite.sh` | this file |
 | 2 | Ask the start question | this file |
-| 3 | Outside reviewer attacks the plan | `references/plan-challenge.md` |
+| 3 | Main agent attacks its own plan against `plan-challenge.md`'s prompt | `references/plan-challenge.md` |
 | 4 | Write or update the issue | `references/write-or-update-ticket.md` |
 | 5 | Open the slice's stacked PR as a draft | `references/create-pr.md` |
 | 6 | Build, review rounds on the PR, gate on the PR | `references/workflow.md`, `references/test-levels.md`, `references/pr-review.md` |
 | 7 | Prove: against the plan, as a user, with red-boxed stills | `references/workflow.md`, `references/proof-capture.md` |
 | 8 | Mark ready, merge, close the issue, next slice | `references/workflow.md`, `references/create-pr.md` |
+
+## Who does what
+
+Two roles. Neither crosses into the other's work.
+
+**Main agent (you, the one the user talks to)** owns everything except
+writing code:
+
+- plan, interrogation, approval
+- every git and GitHub action: branch, commit, push, issue, PR, comments,
+  ready, merge, issue close
+- review of every round (you read the diff yourself; no outside reviewer)
+- gate runs you rely on, the plan check, browser proof and red-boxed stills
+- progress reports to the user
+
+**Implementor subagent** writes code and nothing else:
+
+- Model: **Haiku**, always. Check once per session that the alias really
+  resolves to Haiku (one-line probe) before the first slice.
+- One subagent per slice, run one at a time, never in parallel on one repo.
+- It edits files, writes tests, and runs the lint, typecheck, test and build
+  commands you name, then reports its diff summary and raw gate output.
+- It does **not** run git (no branch, commit, push, stash), `gh`, `gh stack`,
+  PR or issue commands; it does not merge, capture proof, review, spawn
+  agents, or touch files outside its brief.
+- Its brief, written by you, holds: repo path, house rules file, the slice
+  section of the plan, exact files, exact commands, and what to report.
+
+After it reports, you read its diff, re-run the gate yourself, fix the brief
+and send it back if anything is off, then do the git, PR and proof steps.
+Before every merge, confirm the PR base is the repo's integration branch
+(`gh pr view <n> --json baseRefName`), never a GitHub default you did not
+choose.
 
 ## Ticket for status, PR for progress
 

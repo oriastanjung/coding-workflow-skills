@@ -10,15 +10,18 @@ gate has passed for every slice.
 2. Open the slice's PR as a draft before any code (`create-pr.md`). Set the
    slice's ticket to In Progress with the PR link
    (`write-or-update-ticket.md`).
-3. Build the slice. Before the first edit, put the slice's steps from the
-   plan into your agent's task list (or a checklist in `$WORK/plan.md`), with each test as its own item. Work one item at
-   a time and tick it when it is finished. Write tests for every level the
-   slice reaches (`test-levels.md`). When the code forces you off the plan,
-   log it under "Changes during build". Commit the slice's paths,
-   `gh stack submit`, and post a progress comment on the PR.
-4. Review round: a **fresh** reviewer per round (`pr-review.md`), who posts
-   its report on the PR. Reply on the PR to each fault, fix the ones you take,
-   commit, submit, and open the next round. Stop when the verdict is SHIP.
+3. Build the slice through one **Haiku implementor subagent** (see "Who does
+   what" in `SKILL.md`). Brief it with the slice's steps from the plan as a
+   task list, each test its own item, tests for every level the slice
+   reaches (`test-levels.md`), the exact files and the gate commands. It
+   edits and runs commands only; no git, no `gh`. When it reports, read its
+   diff; when the code forced it off the plan, log that under "Changes
+   during build". Then you commit the slice's paths, `gh stack submit`, and
+   post a progress comment on the PR.
+4. Review round: you review the diff yourself against `pr-review.md`'s
+   prompt and post the report on the PR. Faults go back to the same or a new
+   Haiku subagent as a fix brief; you commit, submit, and review again. Stop
+   when the verdict is SHIP.
 5. Gate: run `lint`, `typecheck`, `test`, `build`, `test:e2e`, and post the raw
    output on the PR. Anything red: fix, push, new review round.
 6. Prove the slice, posting each part on the PR:
